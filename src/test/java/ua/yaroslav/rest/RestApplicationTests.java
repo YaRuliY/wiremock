@@ -1,7 +1,6 @@
 package ua.yaroslav.rest;
 
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RestApplicationTests {
-    private static final String APPID = "958aa18762539522212e822ba6d0c276";
+    private static final String APPID = "test_api_id";
     private static final String LONDON = "london";
     private static final String KYIV = "kyiv";
     private static final String Q_PARAM = "q";
@@ -36,10 +36,17 @@ public class RestApplicationTests {
     @Autowired
     private ApplicationContext context;
     @Rule
-    public WireMockClassRule wireMockRule = new WireMockClassRule();
+    public WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig().port(9999));
 
     @Test
-    public void whenRequestWeatherInLondonShouldReturnMockData() {
+    public void whenRequestWeatherInLondonShouldReturnMockData() throws IOException {
+        this.wireMockRule.stubFor(get(urlMatching("/wm.*"))
+                .withQueryParam(Q_PARAM, matching(LONDON))
+                .withQueryParam(APPID_PARAM, matching(APPID))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(getJSON("mapping/london.json"))));
+
         ResponseEntity<String> london = restTemplate.getForEntity("/weather/" + LONDON, String.class);
 
         assertEquals(200, london.getStatusCode().value());
@@ -48,29 +55,19 @@ public class RestApplicationTests {
     }
 
     @Test
-    public void whenRequestWeatherInKyivShouldReturnMockData() {
-        ResponseEntity<String> kyiv = restTemplate.getForEntity("/weather/" + KYIV, String.class);
-
-        assertEquals(200, kyiv.getStatusCode().value());
-        assertTrue(StringUtils.containsAny(kyiv.getBody(), "weather"));
-        assertTrue(StringUtils.containsAny(kyiv.getBody(), "Kyiv"));
-    }
-
-    @Before
-    public void init() throws IOException {
-        this.wireMockRule.stubFor(get(urlMatching("/wm.*"))
-                .withQueryParam(Q_PARAM, matching(LONDON))
-                .withQueryParam(APPID_PARAM, matching(APPID))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
-                        .withBody(getJSON("mapping/london.json"))));
-
+    public void whenRequestWeatherInKyivShouldReturnMockData() throws IOException {
         this.wireMockRule.stubFor(get(urlMatching("/wm.*"))
                 .withQueryParam(Q_PARAM, matching(KYIV))
                 .withQueryParam(APPID_PARAM, matching(APPID))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withBody(getJSON("mapping/kyiv.json"))));
+
+        ResponseEntity<String> kyiv = restTemplate.getForEntity("/weather/" + KYIV, String.class);
+
+        assertEquals(200, kyiv.getStatusCode().value());
+        assertTrue(StringUtils.containsAny(kyiv.getBody(), "weather"));
+        assertTrue(StringUtils.containsAny(kyiv.getBody(), "Kyiv"));
     }
 
     private String getJSON(String path) throws IOException {
