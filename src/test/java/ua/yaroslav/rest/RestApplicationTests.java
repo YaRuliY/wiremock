@@ -70,6 +70,21 @@ public class RestApplicationTests {
         assertTrue(StringUtils.containsAny(kyiv.getBody(), "Kyiv"));
     }
 
+    @Test
+    public void whenRequestWeatherInCityWithWrongNameShouldReturnWeatherException() throws IOException {
+        this.wireMockRule.stubFor(get(urlMatching("/wm.*"))
+                .withQueryParam(Q_PARAM, matching("NotKyiv"))
+                .withQueryParam(APPID_PARAM, matching(APPID))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody(getJSON("mapping/error.json"))));
+
+        ResponseEntity<String> response = restTemplate.getForEntity("/weather/" + "NotKyiv", String.class);
+
+        assertTrue(StringUtils.containsAny(response.getBody(), "message"));
+        assertTrue(StringUtils.containsAny(response.getBody(), "city not found"));
+    }
+
     private String getJSON(String path) throws IOException {
         Resource r = context.getResource("classpath:" + path);
         return new String(Files.readAllBytes(r.getFile().toPath()));
