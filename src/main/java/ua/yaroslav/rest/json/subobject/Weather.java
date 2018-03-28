@@ -1,4 +1,4 @@
-package ua.yaroslav.rest.dto.subobject;
+package ua.yaroslav.rest.json.subobject;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

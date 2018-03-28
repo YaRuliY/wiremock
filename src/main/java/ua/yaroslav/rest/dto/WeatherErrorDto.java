@@ -1,16 +1,16 @@
 package ua.yaroslav.rest.dto;
 
-public class WeatherError {
+public class WeatherErrorDto {
     private String message;
-    private int cod;
+    private int code;
 
-    public WeatherError(){
+    public WeatherErrorDto() {
 
     }
 
-    public WeatherError(String message, int cod) {
+    public WeatherErrorDto(String message, int code) {
         this.message = message;
-        this.cod = cod;
+        this.code = code;
     }
 
     public String getMessage() {
@@ -22,10 +22,10 @@ public class WeatherError {
     }
 
     public int getCod() {
-        return cod;
+        return code;
     }
 
     public void setCod(int cod) {
-        this.cod = cod;
+        this.code = cod;
     }
 }

@@ -1,5 +1,6 @@
 package ua.yaroslav.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,6 +12,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import ua.yaroslav.rest.dto.WeatherResponseDto;
+import ua.yaroslav.rest.exception.WeatherException;
 import wiremock.org.apache.commons.lang3.StringUtils;
 import wiremock.org.apache.http.HttpStatus;
 
@@ -19,8 +22,7 @@ import java.nio.file.Files;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
@@ -31,10 +33,14 @@ public class RestApplicationTests {
     private static final String KYIV = "kyiv";
     private static final String Q_PARAM = "q";
     private static final String APPID_PARAM = "appid";
+
     @Autowired
     private TestRestTemplate restTemplate;
     @Autowired
     private ApplicationContext context;
+    @Autowired
+    private ObjectMapper mapper;
+
     @Rule
     public WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig().port(9999));
 
@@ -48,10 +54,14 @@ public class RestApplicationTests {
                         .withBody(getJSON("mapping/london.json"))));
 
         ResponseEntity<String> london = restTemplate.getForEntity("/weather/" + LONDON, String.class);
+        WeatherResponseDto dto = mapper.readValue(london.getBody(), WeatherResponseDto.class);
 
         assertEquals(200, london.getStatusCode().value());
-        assertTrue(StringUtils.containsAny(london.getBody(), "weather"));
-        assertTrue(StringUtils.containsAny(london.getBody(), "London"));
+        assertNotNull(dto.getDescription());
+        assertNotNull(dto.getName());
+        assertTrue(dto.getWindSpeed() > 0);
+        assertTrue(dto.getPressure() > 0);
+        assertTrue(StringUtils.equals(dto.getName(), "Лондон"));
     }
 
     @Test
@@ -64,10 +74,15 @@ public class RestApplicationTests {
                         .withBody(getJSON("mapping/kyiv.json"))));
 
         ResponseEntity<String> kyiv = restTemplate.getForEntity("/weather/" + KYIV, String.class);
+        WeatherResponseDto dto = mapper.readValue(kyiv.getBody(), WeatherResponseDto.class);
 
+        System.out.println(dto);
         assertEquals(200, kyiv.getStatusCode().value());
-        assertTrue(StringUtils.containsAny(kyiv.getBody(), "weather"));
-        assertTrue(StringUtils.containsAny(kyiv.getBody(), "Kyiv"));
+        assertNotNull(dto.getDescription());
+        assertNotNull(dto.getName());
+        assertTrue(dto.getWindSpeed() > 0);
+        assertTrue(dto.getPressure() > 0);
+        assertTrue(StringUtils.equals(dto.getName(), "Киев"));
     }
 
     @Test
@@ -80,9 +95,10 @@ public class RestApplicationTests {
                         .withBody(getJSON("mapping/error.json"))));
 
         ResponseEntity<String> response = restTemplate.getForEntity("/weather/" + "NotKyiv", String.class);
+        WeatherException weatherException = mapper.readValue(response.getBody(), WeatherException.class);
 
-        assertTrue(StringUtils.containsAny(response.getBody(), "message"));
-        assertTrue(StringUtils.containsAny(response.getBody(), "city not found"));
+        assertEquals("city not found", weatherException.getMessage());
+        assertEquals(404, weatherException.getCode());
         assertEquals(400, response.getStatusCode().value());
     }
 

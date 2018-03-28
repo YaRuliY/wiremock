@@ -1,4 +1,4 @@
-package ua.yaroslav.rest.dto.subobject;
+package ua.yaroslav.rest.json.subobject;
 
 public class Main {
     private double temp;
@@ -12,11 +12,11 @@ public class Main {
     }
 
     public Main(double temp, double pressure, double humidity, double temp_min, double temp_max) {
-        this.temp = temp - 273.16;
-        this.pressure = pressure / 1.38;
+        this.temp = temp;
+        this.pressure = pressure;
         this.humidity = humidity;
-        this.temp_min = temp_min - 273.16;
-        this.temp_max = temp_max - 273.16;
+        this.temp_min = temp_min;
+        this.temp_max = temp_max;
     }
 
     public double getTemp() {
@@ -24,7 +24,7 @@ public class Main {
     }
 
     public void setTemp(double temp) {
-        this.temp = Math.round(temp - 273.16);
+        this.temp = Math.round(temp);
     }
 
     public double getPressure() {
@@ -32,7 +32,7 @@ public class Main {
     }
 
     public void setPressure(double pressure) {
-        this.pressure = Math.round(pressure / 1.38);
+        this.pressure = Math.round(pressure);
     }
 
     public double getHumidity() {
@@ -48,7 +48,7 @@ public class Main {
     }
 
     public void setTemp_min(double temp_min) {
-        this.temp_min = Math.round(temp_min - 273.16);
+        this.temp_min = Math.round(temp_min);
     }
 
     public double getTemp_max() {
@@ -56,6 +56,6 @@ public class Main {
     }
 
     public void setTemp_max(double temp_max) {
-        this.temp_max = Math.round(temp_max - 273.16);
+        this.temp_max = Math.round(temp_max);
     }
 }

@@ -1,16 +1,19 @@
 package ua.yaroslav.rest.exception;
 
-public class WeatherException extends RuntimeException{
-    private String message;
-    private int cod;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
-    public WeatherException(){
+public class WeatherException extends RuntimeException {
+    private String message;
+    private int code;
+
+    public WeatherException() {
 
     }
 
     public WeatherException(String message, int cod) {
         this.message = message;
-        this.cod = cod;
+        this.code = cod;
     }
 
     @Override
@@ -22,16 +25,18 @@ public class WeatherException extends RuntimeException{
         this.message = message;
     }
 
-    public int getCod() {
-        return cod;
+    @JsonGetter("cod")
+    public int getCode() {
+        return code;
     }
 
-    public void setCod(int cod) {
-        this.cod = cod;
+    @JsonSetter("cod")
+    public void setCode(int cod) {
+        this.code = cod;
     }
 
     @Override
     public String toString() {
-        return "WeatherException {" + "message='" + message + '\'' + ", cod=" + cod + '}';
+        return "WeatherException {" + "message='" + message + '\'' + ", code=" + code + '}';
     }
 }

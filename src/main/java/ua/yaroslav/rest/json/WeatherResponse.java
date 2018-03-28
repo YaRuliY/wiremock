@@ -1,9 +1,9 @@
-package ua.yaroslav.rest.dto;
+package ua.yaroslav.rest.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import ua.yaroslav.rest.dto.subobject.Main;
-import ua.yaroslav.rest.dto.subobject.Weather;
-import ua.yaroslav.rest.dto.subobject.Wind;
+import ua.yaroslav.rest.json.subobject.Main;
+import ua.yaroslav.rest.json.subobject.Weather;
+import ua.yaroslav.rest.json.subobject.Wind;
 
 @JsonIgnoreProperties(value = { "coord", "base", "clouds", "dt", "sys", "id", "cod"})
 public class WeatherResponse {
