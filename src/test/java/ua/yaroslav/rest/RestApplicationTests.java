@@ -53,8 +53,8 @@ public class RestApplicationTests {
                         .withStatus(HttpStatus.SC_OK)
                         .withBody(getJSON("mapping/london.json"))));
 
-        ResponseEntity<String> london = restTemplate.getForEntity("/weather/" + LONDON, String.class);
-        WeatherResponseDto dto = mapper.readValue(london.getBody(), WeatherResponseDto.class);
+        ResponseEntity<WeatherResponseDto> london = restTemplate.getForEntity("/weather/" + LONDON, WeatherResponseDto.class);
+        WeatherResponseDto dto = london.getBody();
 
         assertEquals(200, london.getStatusCode().value());
         assertNotNull(dto.getDescription());
@@ -73,8 +73,8 @@ public class RestApplicationTests {
                         .withStatus(HttpStatus.SC_OK)
                         .withBody(getJSON("mapping/kyiv.json"))));
 
-        ResponseEntity<String> kyiv = restTemplate.getForEntity("/weather/" + KYIV, String.class);
-        WeatherResponseDto dto = mapper.readValue(kyiv.getBody(), WeatherResponseDto.class);
+        ResponseEntity<WeatherResponseDto> kyiv = restTemplate.getForEntity("/weather/" + KYIV, WeatherResponseDto.class);
+        WeatherResponseDto dto = kyiv.getBody();
 
         System.out.println(dto);
         assertEquals(200, kyiv.getStatusCode().value());
