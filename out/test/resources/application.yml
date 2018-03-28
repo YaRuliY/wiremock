@@ -1,3 +1,0 @@
-weather:
-  url: http://localhost:9999/wm
-  appid: test_api_id
