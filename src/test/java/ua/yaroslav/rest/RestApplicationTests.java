@@ -76,13 +76,14 @@ public class RestApplicationTests {
                 .withQueryParam(Q_PARAM, matching("NotKyiv"))
                 .withQueryParam(APPID_PARAM, matching(APPID))
                 .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
+                        .withStatus(HttpStatus.SC_BAD_REQUEST)
                         .withBody(getJSON("mapping/error.json"))));
 
         ResponseEntity<String> response = restTemplate.getForEntity("/weather/" + "NotKyiv", String.class);
 
         assertTrue(StringUtils.containsAny(response.getBody(), "message"));
         assertTrue(StringUtils.containsAny(response.getBody(), "city not found"));
+        assertEquals(400, response.getStatusCode().value());
     }
 
     private String getJSON(String path) throws IOException {
