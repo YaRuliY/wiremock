@@ -1,6 +1,5 @@
 package ua.yaroslav.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,8 +37,6 @@ public class RestApplicationTests {
     private TestRestTemplate restTemplate;
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private ObjectMapper mapper;
 
     @Rule
     public WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig().port(9999));
@@ -76,7 +73,6 @@ public class RestApplicationTests {
         ResponseEntity<WeatherResponseDto> kyiv = restTemplate.getForEntity("/weather/" + KYIV, WeatherResponseDto.class);
         WeatherResponseDto dto = kyiv.getBody();
 
-        System.out.println(dto);
         assertEquals(200, kyiv.getStatusCode().value());
         assertNotNull(dto.getDescription());
         assertNotNull(dto.getName());
@@ -94,8 +90,8 @@ public class RestApplicationTests {
                         .withStatus(HttpStatus.SC_BAD_REQUEST)
                         .withBody(getJSON("mapping/error.json"))));
 
-        ResponseEntity<String> response = restTemplate.getForEntity("/weather/" + "NotKyiv", String.class);
-        WeatherException weatherException = mapper.readValue(response.getBody(), WeatherException.class);
+        ResponseEntity<WeatherException> response = restTemplate.getForEntity("/weather/" + "NotKyiv", WeatherException.class);
+        WeatherException weatherException = response.getBody();
 
         assertEquals("city not found", weatherException.getMessage());
         assertEquals(404, weatherException.getCode());
